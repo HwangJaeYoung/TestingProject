@@ -2,7 +2,6 @@
 
 <html>
 <head>
-
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title> oneM2M Web Testing </title>
     <style type="text/css">
@@ -98,7 +97,7 @@
         .resourceName {
             margin-bottom: 10px;
             margin-top: 10px;
-            width:auto;
+            width: auto;
             height: auto;
             background: #ffaaff;
         }
@@ -133,50 +132,103 @@
         }
 
     </style>
+
     <!-- jQuery Framework 참조하기 -->
-    <script type="text/javascript" src="js/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
         $(function () {
 
+            // Creating a resource with RandomValue;
+
+            $('#createResource').click(function() {
+
+                var resourceTitle = prompt('리소스의 이름을 입력하세요', '예) AE 리소스 생성');
+                var resourceName = Math.floor(Math.random() * 10000000); // randomValue for create resource name
+                var params = "resourceName = " + resourceName;
+
+                $.ajax({
+                    url: "http://127.0.0.1:62590/createResource",
+                    type: "post",
+                    dataType: "text",
+                    cache: false,
+                    timeout: 30000,
+                    data : params,
+                    success: function (data) {
+                        // 리소스 네임으로 리소스 애트리뷰트 만들기
+
+
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(textStatus + ' : ' + xhr);
+                    }
+                });
+            });
 
             $('#addHeader').click(function () {
 
                 var html = "<div class=\"contents_row\">" +
                         "<span>" +
-                        "<input type=\"text\" name=\"urlInfo\" />" +
-                        "<input type=\"text\" name=\"urlInfo\" />" +
+                        "<input type=\"text\" class=\"headerName\" />" +
+                        "<input type=\"text\" class=\"headerValue\" />" +
                         "<input type=\"Button\" value=\"Delete\" id=\"delHeader\" />" +
                         "</span></div>";
                 $('#headerList').append(html);
             });
 
             /*
-            $(document).on("click", '#delHeader', function () {
-                $(this).('delHeader').remove();
+             $(document).on("click", '#delHeader', function () {
+             $(this).('delHeader').remove();
+             });
+             */
+
+            $('#request').click(function () {
+
+                var urlInformation = $('#setURL').val(); // Getting the url information
+                var methodInformation = $('#methodList :selected').text(); // Getting the method information
+                var bodyInformation = $("#bodyText").val(); // Gettring the body information
+
+                var headerNameList = $('.headerName'); // Getting the header name list
+                var headerNameLength = $('.headerName').length; // header length
+
+                var headerValueList = $('.headerValue');
+
+                $.ajax({
+                    beforeSend: function (req) {
+                        for (var i = 0; i < headerNameLength; i++) {
+                            req.setRequestHeader(headerNameList[i], headerValueList[i]);
+                        }
+                    },
+                    url: "http://203.253.128.151:7579/mobius-yt",
+                    type: "GET",
+                    cache: false,
+                    timeout: 30000,
+                    success: function (data) {
+                        $('#bodyText2').val(data);
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(textStatus + ': ' + xhr);
+                    }
+                });
             });
 
-
-            $('#resourceName1').click(function() {
+            $('#AE_Create').click(function () {
                 $.ajax({
-                    url: "ResourceFormat/xml/ae.txt",
+                    url: "ResourceFormat/body/xml/AE_Create.xml",
                     type: "get",
                     dataType: "text",
                     cache: false,
                     timeout: 30000,
-                    success: function(data) {
-
-                       alert(data);
+                    success: function (data) {
+                        $('#bodyText').val(data);
                     },
-                    error: function(xhr, textStatus, errorThrown) {
-                        alert("123" + textStatus + ': ' + xhr);
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(textStatus + ': ' + xhr);
                     }
                 });
-            });*/
-
+            });
         });
     </script>
-
 </head>
 
 <body>
@@ -191,7 +243,7 @@
     <span id="testingFormat">
     <div id="urlInfo">
       <span id="methodSelection">
-        <select>
+        <select id="methodList">
             <option value="GET"> GET</option>
             <option value="POST"> POST</option>
             <option value="PUT"> PUT</option>
@@ -200,11 +252,11 @@
       </span>
       
       <span id="url">
-        <input type="text" name="urlInfo"/>
+        <input type="text" id="setURL"/>
       </span>
       
       <span>
-        <input type="submit" value="Send" name="requst"/>
+        <input type="Button" value="Send" id="request"/>
       </span>
     </div>
 
@@ -219,9 +271,8 @@
         <div id="headerList">
             <div id="headerElement">
               <span>
-                <input type="text" name="urlInfo"/>
-                <input type="text" name="urlInfo"/>
-               
+                <input type="text" class="headerName"/>
+                <input type="text" class="headerValue"/>
               </span>
             </div>
         </div>
@@ -244,8 +295,16 @@
 
 <nav id="nav">
     <div class="innertube">
-        <h1>Heading</h1>
-        <div id="resourceName1">
+        <h1> Resource List </h1>
+         <span>
+            <input type="button" value="+ Resource" id="createResource"/>
+            <input type="button" value="- Resource" id="deleteResource"/>
+        </span>
+    </div>
+
+    <div class="innertube">
+
+        <div id="AE_Create">
             AE 리소스 생성
         </div>
         <div id="resourceName2">

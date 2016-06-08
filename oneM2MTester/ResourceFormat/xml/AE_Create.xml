@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<m2m:ae xmlns:m2m="http://www.onem2m.org/xml/protocols" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" rn = "ryeubi">
-    <acpi>/mobius-yt/acp1</acpi>
-    <api>0.2.481.2.0001.001.000111</api>
-</m2m:ae>
