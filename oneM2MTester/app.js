@@ -3,64 +3,76 @@
  * forest62590@gmail.com
  */
 var fs = require('fs');
+var ejs = require('ejs');
 var http = require('http');
 var express = require('express');
+var bodyParser = require('body-parser');
+var dbClient = require('./DataBase/DatabaseConfig');
 
 var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 // Connecting the oneM2M Web Tester page.
-app.get('/', function(reqeust, response) {
-    fs.readFile('TestingView.html', function (error, data) {
-        response.writeHead(200, {'Content-Type': 'text.html'});
-        response.end(data);
+app.get('/', function (reqeust, response) {
 
-        // todo
-        // ejs로 동적으로 리소스 리스트 생성
+    var client = dbClient.getDBClient(); // Getting Database information.
+
+    client.query('SELECT * FROM onem2m', function (error, results, fields) {
+        if (error) { // error
+            console.log("Database resource retrieve error : " + error);
+            response.writeHead(500, {'Content-Type': 'text.html'});
+            response.end();
+        } else { // success
+
+            var jsonObject = new Object();
+            var jsonArray = new Array();
+
+            // Creating the jsonArry to save the resourceName and resourceTitle
+            for (var i = 0; i < results.length; i++) {
+                var resourceName = results[i].resourceName;
+                var resourceTitle = results[i].resourceTitle;
+
+                var tempObject = new Object();
+                tempObject.resourceName = resourceName;
+                tempObject.resourceTitle = resourceTitle;
+
+                jsonArray.push(tempObject);
+            }
+            jsonObject.resourceInfo = jsonArray;
+
+            console.log('Success retrieving the resource');
+
+            fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
+                response.writeHead(200, {'Content-Type': 'text.html'});
+                response.end(ejs.render(data, { resoruceConfig : JSON.stringify(jsonObject) }));
+            });
+        }
     });
-});
-
-
-
-app.get('/getBodyInfo', function(request, response) {
-
-
-
-
 });
 
 // Creating a resource such as CSE_Retrieve, AE_Create, etc
-app.post('/createResource', function(request, response) {
+app.post('/createResource', function (request, response) {
 
-    var aa = request.body.resourceName;
+    var resourceName = request.body.resourceName;
+    var resourceTitle = request.body.resourceTitle;
 
-    console.log(aa);
-    /*
-    fs.open('./ResourceFormat/' + resourceName +'.json', 'a', function(err, fd) {
-        if(err)
-            console.log('FATAL An error occurred trying to write in the file: ' + err);
+    var client = dbClient.getDBClient(); // Getting Database information.
 
-        // 리소스 이름으로 json생성하기
-        var resourceInfo = "{" +
-            "resourceName: " + resourceName +
-        "}";
-
-        var jsonObject = JSON.stringify(resourceInfo); // Creating the json format to save the resourceName
-
-        fs.write(fd, jsonObject, function (err) {
-            if (err)
-                console.log('FATAL An error occurred trying to write in the file: ' + err);
-            else {
-                console.log('Success creating the resource file : ' + resourceName);
-            }
-        });
+    client.query('INSERT INTO onem2m (resourceName, resourceTitle) VALUES (?, ?)', [resourceName, resourceTitle], function (error, results, fields) {
+        if (error) { // error
+            console.log("Database resource creation error : " + error);
+            response.writeHead(500, {'Content-Type': 'text.html'});
+            response.end();
+        } else { // success
+            console.log('Success creating the resource : ' + resourceName);
+            response.writeHead(201, {'Content-Type': 'text.html'});
+            response.end();
+        }
     });
-
-    response.writeHead(200, {'Content-Type': 'text.html'});
-    response.write(resourceName);
-    */
 });
 
 // Server start
 http.createServer(app).listen(62590, function () {
-    console.log('Server running port at ' +  'http://127.0.0.1:62590');
+    console.log('Server running port at ' + 'http://127.0.0.1:62590');
 });
