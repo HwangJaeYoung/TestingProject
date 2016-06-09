@@ -130,17 +130,6 @@
     <script type="text/javascript">
         $(function () {
 
-            $('#addHeader').click(function () {
-
-                var html = "<div class=\"contents_row\">" +
-                        "<span>" +
-                        "<input type=\"text\" class=\"headerName\" />" +
-                        "<input type=\"text\" class=\"headerValue\" />" +
-                        "<input type=\"Button\" value=\"Delete\" id=\"delHeader\" />" +
-                        "</span></div>";
-                $('#headerList').append(html);
-            });
-
             $('#request').click(function () {
 
                 var urlInformation = $('#setURL').val(); // Getting the url information
@@ -171,20 +160,36 @@
                 });
             });
 
-            $('#AE_Create').click(function () {
-                $.ajax({
-                    url: "ResourceFormat/body/xml/AE_Create.xml",
-                    type: "get",
-                    dataType: "text",
-                    cache: false,
-                    timeout: 30000,
-                    success: function (data) {
-                        $('#bodyText').val(data);
-                    },
-                    error: function (xhr, textStatus, errorThrown) {
-                        alert(textStatus + ': ' + xhr);
-                    }
+            // Adding a header
+            $('#addHeader').click(function () {
+
+                var headerElement = $("<div>").append("<span>");
+
+                var inputElement = $("<div>");
+
+                var headerNameInput = $('<input>');
+                headerNameInput.attr({
+                    "type" : "text",
+                    "class" : "headerName"
                 });
+
+                var headerValueInput = $('<input>');
+                headerValueInput.attr({
+                    "type" : "text",
+                    "class" : "headerValue"
+                });
+
+                var headerDelButton = $('<input>');
+                headerDelButton.attr({
+                    "type" : "button",
+                    "value" : "Delete",
+                    "class" : "deleteHeaderFormat"
+                });
+
+                inputElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
+
+                var headerListRoot = $('#headerElement');
+                headerListRoot.append(inputElement);
             });
 
             // Creating a resource with RandomValue;
@@ -220,8 +225,9 @@
                 });
             });
 
-            <!-- Assembling the element for constructing the resource -->
+            // Assembling the element for constructing the resource
             var jsonArray = JSON.parse(JSON.stringify(<%-resourceConfig%>))['resourceInfo'];
+
             var resourceListRoot = $('#resourceListRoot');
 
             for(var i = 0; i < jsonArray.length; i++) {
@@ -275,23 +281,19 @@
         <div id="headerInfo">
             <div id="headerControl">
                 <span>
-                    <input type="Button" value="Add" id="addHeader"/>
+                    <input type="Button" value="Add Header" id="addHeader"/>
                 </span>
             </div>
 
             <div id="headerList">
-                <div id="headerElement">
-                    <span>
-                        <input type="text" class="headerName"/>
-                        <input type="text" class="headerValue"/>
-                    </span>
-                </div>
+                <div id="headerElement"> </div>
             </div>
         </div>
 
         <div id="bodyInfo">
             <textarea id="bodyText" rows="30" cols="87" style="resize:none"> </textarea>
         </div>
+
         </span>
 
         <span id="responseFormat">
