@@ -122,7 +122,6 @@
             height: 100%;
             width: 100%;
         }
-
     </style>
 
     <!-- jQuery Framework 참조하기 -->
@@ -130,38 +129,6 @@
 
     <script type="text/javascript">
         $(function () {
-
-            // Creating a resource with RandomValue;
-            $('#createResource').click(function() {
-
-                var resourceTitle = prompt('리소스의 이름을 입력하세요', '예) AE 리소스 생성');
-                var resourceName = Math.floor(Math.random() * 10000000); // randomValue for create resource name
-                var params = "resourceName=" + resourceName + "&" + "resourceTitle=" + resourceTitle;
-
-                $.ajax({
-                    url: "http://127.0.0.1:62590/createResource",
-                    type: "post",
-                    dataType: "text",
-                    cache: false,
-                    timeout: 30000,
-                    data : params,
-                    success: function (data) {
-
-                        // Creating a resource list with resourceName
-                        var resourceListRoot = $('#resourceList');
-
-                        // Constructing the resource list
-                        var resourceElement = $("<div>");
-                        resourceElement.attr({'id': resourceName});
-                        resourceElement.html(resourceTitle);
-
-                        resourceListRoot.append(resourceElement); // Adding the element to root */
-                    },
-                    error: function (xhr, textStatus, errorThrown) {
-                        alert(textStatus + ' : ' + xhr);
-                    }
-                });
-            });
 
             $('#addHeader').click(function () {
 
@@ -173,12 +140,6 @@
                         "</span></div>";
                 $('#headerList').append(html);
             });
-
-            /*
-             $(document).on("click", '#delHeader', function () {
-             $(this).('delHeader').remove();
-             });
-             */
 
             $('#request').click(function () {
 
@@ -225,7 +186,61 @@
                     }
                 });
             });
+
+            // Creating a resource with RandomValue;
+            $('#createResource').click(function() {
+
+                var resourceTitle = prompt('리소스의 이름을 입력하세요', '예) AE 리소스 생성');
+                var resourceName = Math.floor(Math.random() * 10000000); // randomValue for create resource name
+                var params = "resourceName=" + resourceName + "&" + "resourceTitle=" + resourceTitle;
+
+                $.ajax({
+                    url: "http://127.0.0.1:62590/createResource",
+                    type: "post",
+                    dataType: "text",
+                    cache: false,
+                    timeout: 30000,
+                    data : params,
+                    success: function (data) {
+
+                        // Creating a resource list with resourceName
+                        var resourceListRoot = $('#resourceListRoot');
+
+                        // Constructing the resource list
+                        var resourceElement = $("<div>");
+                        resourceElement.attr({'id': resourceName});
+                        resourceElement.addClass("resourceListEvent");
+                        resourceElement.html(resourceTitle);
+
+                        resourceListRoot.append(resourceElement); // Adding the element to root */
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(textStatus + ' : ' + xhr);
+                    }
+                });
+            });
+
+            <!-- Assembling the element for constructing the resource -->
+            var jsonArray = JSON.parse(JSON.stringify(<%-resourceConfig%>))['resourceInfo'];
+            var resourceListRoot = $('#resourceListRoot');
+
+            for(var i = 0; i < jsonArray.length; i++) {
+                // Constructing the resource list
+                var resourceElement = $("<div>");
+                resourceElement.attr({'id': jsonArray[i].resourceName});
+                resourceElement.addClass("resourceListEvent");
+                resourceElement.html(jsonArray[i].resourceTitle);
+
+                resourceListRoot.append(resourceElement);
+            }
+
+            // Getting the saved data such as header and body information.
+            $(document).on("click", '.resourceListEvent', function () {
+                var idValue = $(this).attr('id');
+                alert(idValue);
+            });
         });
+
     </script>
 </head>
 
@@ -294,12 +309,7 @@
                 <input type="button" value="- Resource" id="deleteResource"/>
             </span>
         </div>
-
-        <% for(var i = 0; i < 5; i++) { %>
-        <div id= <%= i %> class="targetEvent" class="innertube">
-            <input type="button" value="+ Resource"/>
-        </div>
-        <% } %>
+        <div id = "resourceListRoot" class="innertube"> </div>
     </nav>
     </body>
 </html>
