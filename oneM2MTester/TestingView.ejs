@@ -240,10 +240,43 @@
                 resourceListRoot.append(resourceElement);
             }
 
+            $('#deleteResource').click(function() {
+
+                var check = confirm("Do you delete the selected resource?");
+
+                if(check == true) {
+                    var params = "resourceName=" + idValue;
+
+                    $.ajax({
+                        url: "http://127.0.0.1:62590/deleteResource",
+                        type: "delete",
+                        dataType: "json",
+                        cache: false,
+                        timeout: 30000,
+                        data : params,
+                        contentType: "application/json; charset=UTF-8",
+                        success: function (data) {
+                            console.log(data);
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            alert(textStatus + ' : ' + xhr);
+                        }
+                    });
+                } else {
+                    // code blank...
+                }
+            });
+
             // Getting the saved data such as header and body information.
             $(document).on("click", '.resourceListEvent', function () {
-                var idValue = $(this).attr('id');
-                alert(idValue);
+
+                // Changing the resource list color.
+                $('.resourceListEvent').css("background", "#DAE9BC");
+                $(this).css('background', "#a7dbd8")
+
+                /* Using a global variable */
+                // This is a global variable for deleting the resource.
+                window.idValue = $(this).attr('id');
             });
         });
 

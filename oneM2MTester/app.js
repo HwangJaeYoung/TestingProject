@@ -51,6 +51,51 @@ app.get('/', function (reqeust, response) {
     });
 });
 
+// Deleting the selected resource list
+app.delete('/deleteResource', function(request, response){
+
+    var resourceName = request.body.resourceName;
+    var client = dbClient.getDBClient(); // Getting Database information.
+
+    client.query('DELETE FROM onem2m WHERE resourceName=?', [resourceName], function (error, results, fields) {
+        if (error) { // error
+            console.log("MySQL : Database resource delete error : " + error);
+            response.writeHead(500, {'Content-Type': 'text.html'});
+            response.end();
+        } else { // success
+            client.query('SELECT * FROM onem2m ORDER BY time ASC', function (error, results, fields) {
+                if (error) { // error
+                    console.log("MySQL : Database resource retrieve error : " + error);
+                    response.writeHead(500, {'Content-Type': 'text.html'});
+                    response.end();
+                } else { // success
+
+                    var jsonObject = new Object();
+                    var jsonArray = new Array();
+
+                    // Creating the jsonArry to save the resourceName and resourceTitle
+                    for (var i = 0; i < results.length; i++) {
+                        var resourceName = results[i].resourceName;
+                        var resourceTitle = results[i].resourceTitle;
+
+                        var tempObject = new Object();
+                        tempObject.resourceName = resourceName;
+                        tempObject.resourceTitle = resourceTitle;
+
+                        jsonArray.push(tempObject);
+                    }
+
+                    jsonObject.resourceInfo = jsonArray;
+
+                    console.log('MySQL : Success retrieving the resource');
+                    response.writeHead(200, {'Content-Type': 'text.html'});
+                    response.send(jsonObject);
+                }
+            });
+        }
+    });
+});
+
 // Creating a resource such as CSE_Retrieve, AE_Create, etc
 app.post('/createResource', function (request, response) {
 
