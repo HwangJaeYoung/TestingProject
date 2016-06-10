@@ -155,7 +155,7 @@
                         $('#bodyText2').val(data);
                     },
                     error: function (xhr, textStatus, errorThrown) {
-                        alert(textStatus + ': ' + xhr + '/' + 'Please try again!!');
+                        alert(textStatus + ': ' + errorThrown + '/' + 'Please try again!!');
                     }
                 });
             });
@@ -196,70 +196,55 @@
             $('#createResource').click(function() {
 
                 var resourceTitle = prompt('리소스의 이름을 입력하세요', '예) AE 리소스 생성');
-                var resourceName = Math.floor(Math.random() * 10000000); // randomValue for create resource name
-                var params = "resourceName=" + resourceName + "&" + "resourceTitle=" + resourceTitle;
 
-                $.ajax({
-                    url: "http://127.0.0.1:62590/createResource",
-                    type: "post",
-                    dataType: "text",
-                    cache: false,
-                    timeout: 30000,
-                    data : params,
-                    success: function (data) {
+                if(resourceTitle) {
+                    var resourceName = Math.floor(Math.random() * 10000000); // randomValue for create resource name
+                    var params = "resourceName=" + resourceName + "&" + "resourceTitle=" + resourceTitle;
 
-                        // Creating a resource list with resourceName
-                        var resourceListRoot = $('#resourceListRoot');
+                    $.ajax({
+                        url: "http://127.0.0.1:62590/createResource",
+                        type: "post",
+                        dataType: "text",
+                        cache: false,
+                        timeout: 30000,
+                        data: params,
+                        success: function (data) {
+                            // Creating a resource list with resourceName
+                            var resourceListRoot = $('#resourceListRoot');
 
-                        // Constructing the resource list
-                        var resourceElement = $("<div>");
-                        resourceElement.attr({'id': resourceName});
-                        resourceElement.addClass("resourceListEvent");
-                        resourceElement.html(resourceTitle);
+                            // Constructing the resource list
+                            var resourceElement = $("<div>");
+                            resourceElement.attr({'id': resourceName});
+                            resourceElement.addClass("resourceListEvent");
+                            resourceElement.html(resourceTitle);
 
-                        resourceListRoot.append(resourceElement); // Adding the element to root */
-                    },
-                    error: function (xhr, textStatus, errorThrown) {
-                        alert(textStatus + ' : ' + xhr);
-                    }
-                });
+                            resourceListRoot.append(resourceElement); // Adding the element to root */
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            alert(textStatus + ' : ' + errorThrown);
+                        }
+                    });
+                }
             });
 
-            // Assembling the element for constructing the resource
-            var jsonArray = JSON.parse(JSON.stringify(<%-resourceConfig%>))['resourceInfo'];
-
-            var resourceListRoot = $('#resourceListRoot');
-
-            for(var i = 0; i < jsonArray.length; i++) {
-                // Constructing the resource list
-                var resourceElement = $("<div>");
-                resourceElement.attr({'id': jsonArray[i].resourceName});
-                resourceElement.addClass("resourceListEvent");
-                resourceElement.html(jsonArray[i].resourceTitle);
-
-                resourceListRoot.append(resourceElement);
-            }
-
             $('#deleteResource').click(function() {
-
                 var check = confirm("Do you delete the selected resource?");
 
                 if(check == true) {
-                    var params = "resourceName=" + idValue;
-
                     $.ajax({
-                        url: "http://127.0.0.1:62590/deleteResource",
+                        url: "http://127.0.0.1:62590/deleteResource/" + idValue,
                         type: "delete",
                         dataType: "json",
                         cache: false,
                         timeout: 30000,
-                        data : params,
                         contentType: "application/json; charset=UTF-8",
-                        success: function (data) {
-                            console.log(data);
+                        success: function (jsonObject) {
+                            $('.resourceListEvent').remove(); // Deleting the all resource of the resourceListRoot Element
+                            var jsonArray = jsonObject['resourceInfo'];
+                            createFunction(jsonArray);
                         },
                         error: function (xhr, textStatus, errorThrown) {
-                            alert(textStatus + ' : ' + xhr);
+                            alert(textStatus + ' : ' + errorThrown);
                         }
                     });
                 } else {
@@ -278,8 +263,25 @@
                 // This is a global variable for deleting the resource.
                 window.idValue = $(this).attr('id');
             });
-        });
 
+            // Assembling the element for constructing the resource
+            var jsonArray = JSON.parse(JSON.stringify(<%-resourceConfig%>))['resourceInfo'];
+            createFunction(jsonArray);
+
+            function createFunction(jsonArray) {
+                var resourceListRoot = $('#resourceListRoot');
+
+                for(var i = 0; i < jsonArray.length; i++) {
+                    // Constructing the resource list
+                    var resourceElement = $("<div>");
+                    resourceElement.attr({'id': jsonArray[i].resourceName});
+                    resourceElement.addClass("resourceListEvent");
+                    resourceElement.html(jsonArray[i].resourceTitle);
+
+                    resourceListRoot.append(resourceElement);
+                }
+            }
+        });
     </script>
 </head>
 

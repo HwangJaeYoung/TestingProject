@@ -21,8 +21,7 @@ app.get('/', function (reqeust, response) {
     client.query('SELECT * FROM onem2m ORDER BY time ASC', function (error, results, fields) {
         if (error) { // error
             console.log("MySQL : Database resource retrieve error : " + error);
-            response.writeHead(500, {'Content-Type': 'text.html'});
-            response.end();
+            response.status(500).end();
         } else { // success
 
             var jsonObject = new Object();
@@ -44,31 +43,29 @@ app.get('/', function (reqeust, response) {
             console.log('MySQL : Success retrieving the resource');
 
             fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
-                response.writeHead(200, {'Content-Type': 'text.html'});
-                response.end(ejs.render(data, { resourceConfig : JSON.stringify(jsonObject) }));
+                response.status(200).end(ejs.render(data, { resourceConfig : JSON.stringify(jsonObject) }));
             });
         }
     });
 });
 
 // Deleting the selected resource list
-app.delete('/deleteResource', function(request, response){
+app.delete('/deleteResource/:resourceName', function(request, response){
 
-    var resourceName = request.body.resourceName;
+    var resourceName = request.params.resourceName;
     var client = dbClient.getDBClient(); // Getting Database information.
 
     client.query('DELETE FROM onem2m WHERE resourceName=?', [resourceName], function (error, results, fields) {
         if (error) { // error
             console.log("MySQL : Database resource delete error : " + error);
-            response.writeHead(500, {'Content-Type': 'text.html'});
-            response.end();
+            response.status(500).end();
         } else { // success
             client.query('SELECT * FROM onem2m ORDER BY time ASC', function (error, results, fields) {
                 if (error) { // error
                     console.log("MySQL : Database resource retrieve error : " + error);
-                    response.writeHead(500, {'Content-Type': 'text.html'});
-                    response.end();
+                    response.status(500).end();
                 } else { // success
+                    console.log('MySQL : Success retrieving the resource');
 
                     var jsonObject = new Object();
                     var jsonArray = new Array();
@@ -84,12 +81,8 @@ app.delete('/deleteResource', function(request, response){
 
                         jsonArray.push(tempObject);
                     }
-
                     jsonObject.resourceInfo = jsonArray;
-
-                    console.log('MySQL : Success retrieving the resource');
-                    response.writeHead(200, {'Content-Type': 'text.html'});
-                    response.send(jsonObject);
+                    response.status(200).send(jsonObject);
                 }
             });
         }
@@ -121,12 +114,10 @@ app.post('/createResource', function (request, response) {
     client.query('INSERT INTO onem2m (resourceName, resourceTitle, time) VALUES (?, ?, ?)', [resourceName, resourceTitle, time], function (error, results, fields) {
         if (error) { // error
             console.log("MySQL : Database resource creation error : " + error);
-            response.writeHead(500, {'Content-Type': 'text.html'});
-            response.end();
+            response.status(500).end();
         } else { // success
             console.log('MySQL : Success creating the resource : ' + resourceName);
-            response.writeHead(201, {'Content-Type': 'text.html'});
-            response.end();
+            response.status(201).end();
         }
     });
 });
