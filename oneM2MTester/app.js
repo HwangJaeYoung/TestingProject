@@ -49,6 +49,19 @@ app.get('/', function (reqeust, response) {
     });
 });
 
+// Retrieving the request form information from MySQL.
+app.get('/', function (reqeust, response) {
+
+
+
+
+
+
+
+
+
+});
+
 // Deleting the selected resource list
 app.delete('/deleteResource/:resourceName', function(request, response){
 
@@ -120,6 +133,42 @@ app.post('/createResource', function (request, response) {
             response.status(201).end();
         }
     });
+});
+
+// Saving the request information
+app.post('/saveResource', function (request, response) {
+
+    var resultObj = request.body;
+    var str = '';
+    for(var i in resultObj) {
+        if(resultObj.hasOwnProperty(i)) {
+            str += i + " = " + resultObj[i] + '\n';
+        }
+    }
+
+
+    console.log(JSON.stringify(request.body));
+    console.log("asdf : " + str);
+
+    // var result = request.body;
+    //var resultobj = result['requestInfo']
+    // var resultobj2 = resultobj['urlInformation'];
+    //console.log(resultobj2);
+
+    //console.log(jObject.resourceInfo.bodyInformation);
+
+    /* 이미 있으면 업데이트로 해야됨
+    var client = dbClient.getDBClient(); // Getting Database information.
+
+    client.query('INSERT INTO onem2m (resourceName, resourceTitle, time) VALUES (?, ?, ?)', [resourceName, resourceTitle, time], function (error, results, fields) {
+        if (error) { // error
+            console.log("MySQL : Database resource creation error : " + error);
+            response.status(500).end();
+        } else { // success
+            console.log('MySQL : Success creating the resource : ' + resourceName);
+            response.status(201).end();
+        }
+    }); */
 });
 
 // Server start

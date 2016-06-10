@@ -91,7 +91,16 @@
             left: 20px;
             margin-top: 20px;
             height: 380px;
-            width: 635px;
+            width: 205px;
+        }
+
+        #saveButtonInfo {
+            position: relative;
+            top: 120px;
+            left: 500px;
+            margin-top: 20px;
+            height: 30px;
+            width: 60px;
         }
 
         .innertube {
@@ -128,68 +137,98 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
+
+        /************** Defining the global variable **************/
+        window.idValue = 0;
+        window.headerCount = 0;
+
         $(function () {
 
-            $('#request').click(function () {
+            // todo
+            // No data check
 
+
+            // Saving the all request information
+            $('#saveButton').click(function () {
                 var urlInformation = $('#setURL').val(); // Getting the url information
                 var methodInformation = $('#methodList :selected').text(); // Getting the method information
-                var bodyInformation = $("#bodyText").val(); // Gettring the body information
-
+                var bodyInformation = $("#bodyText").val(); // Getting the body information
                 var headerNameList = $('.headerName'); // Getting the header name list
-                var headerNameLength = $('.headerName').length; // header length
+                var headerValueList = $('.headerValue'); // Getting the header value list
 
-                var headerValueList = $('.headerValue');
+                // Formatting the JSON Object
+                var jsonObject = new Object();
+                var jsonArray = new Array();
+
+                jsonObject.requestInfo = new Object();
+                jsonObject.requestInfo.urlInformation = urlInformation;
+                jsonObject.requestInfo.methodInformation = methodInformation;
+                jsonObject.requestInfo.bodyInformation = bodyInformation;
+
+                // Creating the JSONArray to save the request information
+                for (var i = 0; i < headerNameList.length; i++) {
+                    var headerName = headerNameList[i].value;
+                    var headerValue = headerValueList[i].value;
+
+                    var tempObject = new Object();
+                    tempObject.headerName = headerName;
+                    tempObject.headerValue = headerValue;
+
+                    jsonArray.push(tempObject);
+                }
+                jsonObject.requestInfo.headerInformation = jsonArray;
 
                 $.ajax({
-                    beforeSend: function (req) {
-                        for (var i = 0; i < headerNameLength; i++) {
-                            req.setRequestHeader(headerNameList[i], headerValueList[i]);
-                        }
-                    },
-                    url: "http://203.253.128.151:7579/mobius-yt",
-                    type: "GET",
+                    url: "http://127.0.0.1:62590/saveResource",
+                    type: "post",
+                    dataType: "text",
                     cache: false,
                     timeout: 30000,
+                    data: JSON.stringify(jsonObject),
                     success: function (data) {
-                        $('#bodyText2').val(data);
+
                     },
                     error: function (xhr, textStatus, errorThrown) {
-                        alert(textStatus + ': ' + errorThrown + '/' + 'Please try again!!');
+                        alert(textStatus + ' : ' + errorThrown);
                     }
                 });
             });
 
-            // Adding a header
+            // Adding a header (Maximum 8)
             $('#addHeader').click(function () {
 
-                var headerElement = $("<div>").append("<span>");
+                if (headerCount < 8) {
+                    var headerElement = $("<div>").append("<span>");
 
-                var inputElement = $("<div>");
+                    var inputElement = $("<div>");
 
-                var headerNameInput = $('<input>');
-                headerNameInput.attr({
-                    "type" : "text",
-                    "class" : "headerName"
-                });
+                    var headerNameInput = $('<input>');
+                    headerNameInput.attr({
+                        "type": "text",
+                        "class": "headerName"
+                    });
 
-                var headerValueInput = $('<input>');
-                headerValueInput.attr({
-                    "type" : "text",
-                    "class" : "headerValue"
-                });
+                    var headerValueInput = $('<input>');
+                    headerValueInput.attr({
+                        "type": "text",
+                        "class": "headerValue"
+                    });
 
-                var headerDelButton = $('<input>');
-                headerDelButton.attr({
-                    "type" : "button",
-                    "value" : "Delete",
-                    "class" : "deleteHeaderFormat"
-                });
+                    var headerDelButton = $('<input>');
+                    headerDelButton.attr({
+                        "type": "button",
+                        "value": "Delete",
+                        "class": "deleteHeaderFormat"
+                    });
 
-                inputElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
+                    inputElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
 
-                var headerListRoot = $('#headerElement');
-                headerListRoot.append(inputElement);
+                    var headerListRoot = $('#headerElement');
+                    headerListRoot.append(inputElement);
+                    headerCount++;
+                } else if (headerCount == 8) {
+                    alert("Don't create the header more than 9");
+                }
             });
 
             // Creating a resource with RandomValue;
@@ -230,7 +269,7 @@
             $('#deleteResource').click(function() {
                 var check = confirm("Do you delete the selected resource?");
 
-                if(check == true) {
+                if(check == true && idValue != 0) {
                     $.ajax({
                         url: "http://127.0.0.1:62590/deleteResource/" + idValue,
                         type: "delete",
@@ -261,7 +300,7 @@
 
                 /* Using a global variable */
                 // This is a global variable for deleting the resource.
-                window.idValue = $(this).attr('id');
+                idValue = $(this).attr('id');
             });
 
             // Assembling the element for constructing the resource
@@ -297,10 +336,10 @@
         <div id="urlInfo">
             <span id="methodSelection">
                 <select id="methodList">
-                    <option value="GET"> GET</option>
-                    <option value="POST"> POST</option>
-                    <option value="PUT"> PUT</option>
-                    <option value="DELETE"> DELETE</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
                 </select>
             </span>
       
@@ -326,14 +365,17 @@
         </div>
 
         <div id="bodyInfo">
-            <textarea id="bodyText" rows="30" cols="87" style="resize:none"> </textarea>
+            <textarea id="bodyText" rows="30" cols="87" style="resize:none"></textarea>
+        </div>
+        <div id ="saveButtonInfo">
+            <input type="Button" value="Saving form information" id="saveButton"/>
         </div>
 
         </span>
 
         <span id="responseFormat">
             <div id="bodyInfo2">
-                <textarea id="bodyText2" rows="30" cols="87" style="resize:none"> </textarea>
+                <textarea id="bodyText2" rows="30" cols="87" style="resize:none"></textarea>
             </div>
         </span>
     </main>
