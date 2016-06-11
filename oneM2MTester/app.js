@@ -43,7 +43,7 @@ app.get('/', function (reqeust, response) {
             console.log('MySQL : Success retrieving the resource');
 
             fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
-                response.status(200).end(ejs.render(data, { resourceConfig : JSON.stringify(jsonObject) }));
+                response.status(200).end(ejs.render(data, {resourceConfig: JSON.stringify(jsonObject)}));
             });
         }
     });
@@ -53,17 +53,10 @@ app.get('/', function (reqeust, response) {
 app.get('/', function (reqeust, response) {
 
 
-
-
-
-
-
-
-
 });
 
 // Deleting the selected resource list
-app.delete('/deleteResource/:resourceName', function(request, response){
+app.delete('/deleteResource/:resourceName', function (request, response) {
 
     var resourceName = request.params.resourceName;
     var client = dbClient.getDBClient(); // Getting Database information.
@@ -110,19 +103,7 @@ app.post('/createResource', function (request, response) {
 
     var client = dbClient.getDBClient(); // Getting Database information.
 
-    var cur_d = new Date();
-
-    var msec = '';
-
-    if((parseInt(cur_d.getMilliseconds(), 10) < 10)) {
-        msec = ('00' + cur_d.getMilliseconds());
-    } else if((parseInt(cur_d.getMilliseconds(), 10) < 100)) {
-        msec = ('0' + cur_d.getMilliseconds());
-    } else {
-        msec = cur_d.getMilliseconds();
-    }
-
-    var time = "" + cur_d.getFullYear() + (cur_d.getMonth() + 1) + cur_d.getDate() + cur_d.getHours() + cur_d.getMinutes( ) + cur_d.getSeconds() + msec;
+    var time = timestamp( );
 
     client.query('INSERT INTO onem2m (resourceName, resourceTitle, time) VALUES (?, ?, ?)', [resourceName, resourceTitle, time], function (error, results, fields) {
         if (error) { // error
@@ -139,39 +120,55 @@ app.post('/createResource', function (request, response) {
 app.post('/saveResource', function (request, response) {
 
     var resultObj = request.body;
-    var str = '';
-    for(var i in resultObj) {
-        if(resultObj.hasOwnProperty(i)) {
-            str += i + " = " + resultObj[i] + '\n';
-        }
+    var requestInfoObject = resultObj['requestInfo'];
+
+    var resourceName = requestInfoObject['resourceName'];
+    var urlInformation = requestInfoObject['urlInformation'];
+    var methodInformation = requestInfoObject['methodInformation'];
+    var boyInformation = requestInfoObject['bodyInformation'];
+    var headerInformation = requestInfoObject['headerInformation'];
+
+    // Arranging the header values
+    var headerArray = new Array();
+    for(var i = 0; i < headerInformation.length; i++) {
+        var tempHeaderValue = headerInformation[i]['headerName'] + ":" + headerInformation[i]['headerValue'];
+        headerArray[i] = tempHeaderValue;
     }
 
-
-    console.log(JSON.stringify(request.body));
-    console.log("asdf : " + str);
-
-    // var result = request.body;
-    //var resultobj = result['requestInfo']
-    // var resultobj2 = resultobj['urlInformation'];
-    //console.log(resultobj2);
-
-    //console.log(jObject.resourceInfo.bodyInformation);
-
-    /* 이미 있으면 업데이트로 해야됨
     var client = dbClient.getDBClient(); // Getting Database information.
 
-    client.query('INSERT INTO onem2m (resourceName, resourceTitle, time) VALUES (?, ?, ?)', [resourceName, resourceTitle, time], function (error, results, fields) {
-        if (error) { // error
-            console.log("MySQL : Database resource creation error : " + error);
-            response.status(500).end();
-        } else { // success
-            console.log('MySQL : Success creating the resource : ' + resourceName);
-            response.status(201).end();
-        }
-    }); */
+    // Updating the user request format
+    client.query('UPDATE onem2m SET urlInformation=?, methodInformation=?, header1=?, header2=?, header3=?, header4=?, header5=?, header6=?, header7=?, header8=?, resourceBody=? WHERE resourceName=?',
+        [urlInformation, methodInformation, headerArray[0], headerArray[1], headerArray[2], headerArray[3], headerArray[4], headerArray[5], headerArray[6], headerArray[7], boyInformation, resourceName], function (error, results, fields) {
+            if (error) { // error
+                console.log("MySQL : Database resource update error : " + error);
+                response.status(500).end();
+            } else { // success
+                console.log('MySQL : Success updating the resource : ' + resourceName);
+                response.status(200).end();
+            }
+    });
 });
 
 // Server start
 http.createServer(app).listen(62590, function () {
     console.log('Server running port at ' + 'http://127.0.0.1:62590');
 });
+
+function timestamp( ) {
+    var cur_d = new Date();
+
+    var msec = '';
+
+    if ((parseInt(cur_d.getMilliseconds(), 10) < 10)) {
+        msec = ('00' + cur_d.getMilliseconds());
+    } else if ((parseInt(cur_d.getMilliseconds(), 10) < 100)) {
+        msec = ('0' + cur_d.getMilliseconds());
+    } else {
+        msec = cur_d.getMilliseconds();
+    }
+
+    var time = "" + cur_d.getFullYear() + (cur_d.getMonth() + 1) + cur_d.getDate() + cur_d.getHours() + cur_d.getMinutes() + cur_d.getSeconds() + msec;
+
+    return time;
+}
