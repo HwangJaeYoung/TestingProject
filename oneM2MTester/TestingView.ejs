@@ -82,7 +82,7 @@
             background: #faf;
             width: 635px;
             height: 200px;
-
+            overflow: auto;
         }
 
         #bodyInfo {
@@ -134,8 +134,7 @@
     </style>
 
     <!-- jQuery Framework 참조하기 -->
-    <script src="https://code.jquery.com/jquery-1.12.4.js"
-            integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
 
@@ -144,10 +143,6 @@
         window.headerCount = 0;
 
         $(function () {
-
-            // todo
-            // No data check
-
 
             // Saving the all request information
             $('#saveButton').click(function () {
@@ -243,7 +238,7 @@
             // Creating a resource with RandomValue;
             $('#createResource').click(function () {
 
-                var resourceTitle = prompt('리소스의 이름을 입력하세요', '예) AE 리소스 생성');
+                var resourceTitle = prompt(' Enter the resource name', 'ex) AE_Resource_Create');
 
                 if (resourceTitle) {
                     var resourceName = Math.floor(Math.random() * 10000000); // randomValue for create resource name
@@ -276,27 +271,32 @@
             });
 
             $('#deleteResource').click(function () {
-                var check = confirm("Do you delete the selected resource?");
 
-                if (check == true && idValue != 0) {
-                    $.ajax({
-                        url: "http://127.0.0.1:62590/deleteResource/" + idValue,
-                        type: "delete",
-                        dataType: "json",
-                        cache: false,
-                        timeout: 30000,
-                        contentType: "application/json; charset=UTF-8",
-                        success: function (jsonObject) {
-                            $('.resourceListEvent').remove(); // Deleting the all resource of the resourceListRoot Element
-                            var jsonArray = jsonObject['resourceInfo'];
-                            createFunction(jsonArray);
-                        },
-                        error: function (xhr, textStatus, errorThrown) {
-                            alert(textStatus + ' : ' + errorThrown);
-                        }
-                    });
+                if (idValue != 0) {
+                    var check = confirm("Do you delete the selected resource?");
+
+                    if (check == true && idValue != 0) {
+                        $.ajax({
+                            url: "http://127.0.0.1:62590/deleteResource/" + idValue,
+                            type: "delete",
+                            dataType: "json",
+                            cache: false,
+                            timeout: 30000,
+                            contentType: "application/json; charset=UTF-8",
+                            success: function (jsonObject) {
+                                $('.resourceListEvent').remove(); // Deleting the all resource of the resourceListRoot Element
+                                var jsonArray = jsonObject['resourceInfo'];
+                                createFunction(jsonArray);
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                alert(textStatus + ' : ' + errorThrown);
+                            }
+                        });
+                    } else {
+                        // code blank...
+                    }
                 } else {
-                    // code blank...
+                    alert("You are not selecting the specific resource list!!");
                 }
             });
 
@@ -308,8 +308,72 @@
                 $(this).css('background', "#a7dbd8")
 
                 /* Using a global variable */
-                // This is a global variable for deleting the resource.
-                idValue = $(this).attr('id');
+                idValue = $(this).attr('id'); // This is a global variable for deleting the resource.
+
+                $.ajax({
+                    url: "http://127.0.0.1:62590/getSelectedResource/" + idValue,
+                    type: "get",
+                    dataType: "json",
+                    cache: false,
+                    timeout: 30000,
+                    success: function (jsonObject) {
+
+                        // Retrieving the selected variable value such as url, method, header, body
+                        var resultObject = jsonObject['requestInfo'];
+
+                        var urlInformation = resultObject['urlInformation'];
+                        var methodInformation = resultObject['methodInformation'];
+                        var bodyInformation = resultObject['bodyInformation'];
+                        var headerInformation = resultObject['headerInformation'];
+
+                        for(var i = 0; i < headerInformation.length; i++) {
+                            if(headerInformation[i] != null) {
+
+                                var headerSplitArray = headerInformation[i].split(":");
+                                var headerName = headerSplitArray[0];
+                                var headerValue = headerSplitArray[1];
+
+                                var headerElement = $("<div>").append("<span>");
+
+                                var headerNameInput = $('<input>');
+                                headerNameInput.attr({
+                                    "type": "text",
+                                    "class": "headerName"
+                                }).val(headerName);
+
+                                var headerValueInput = $('<input>');
+                                headerValueInput.attr({
+                                    "type": "text",
+                                    "class": "headerValue"
+                                }).val(headerValue);
+
+                                var headerDelButton = $('<input>');
+                                headerDelButton.attr({
+                                    "type": "button",
+                                    "value": "Delete",
+                                    "class": "deleteHeaderFormat"
+                                });
+
+                                headerElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
+
+                                var headerListRoot = $('#headerElement');
+                                headerListRoot.append(headerElement);
+                                headerCount++;
+                            }
+                        }
+
+                        // Formatting the request layout
+                        if(methodInformation == null)
+                            $('#methodList').val("GET");
+                        else
+                            $('#methodList').val(methodInformation);
+                        $('#setURL').val(urlInformation);
+                        $('#bodyText').val(bodyInformation);
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert(textStatus + ' : ' + errorThrown);
+                    }
+                });
             });
 
             // Deleteing the saved header list
@@ -389,8 +453,8 @@
         </span>
 
         <span id="responseFormat">
-            <div id="bodyInfo2">
-                <textarea id="bodyText2" rows="30" cols="87" style="resize:none"></textarea>
+            <div id="bodyInfoResult">
+                <textarea id="bodyTextResult" rows="30" cols="87" style="resize:none"></textarea>
             </div>
         </span>
 </main>

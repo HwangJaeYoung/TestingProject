@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 // Connecting the oneM2M Web Tester page.
-app.get('/', function (reqeust, response) {
+app.get('/', function (request, response) {
 
     var client = dbClient.getDBClient(); // Getting Database information.
 
@@ -23,36 +23,66 @@ app.get('/', function (reqeust, response) {
             console.log("MySQL : Database resource retrieve error : " + error);
             response.status(500).end();
         } else { // success
+            if(results.length != 0) {
+                var jsonObject = new Object();
+                var jsonArray = new Array();
 
-            var jsonObject = new Object();
-            var jsonArray = new Array();
+                // Creating the jsonArry to save the resourceName and resourceTitle
+                for (var i = 0; i < results.length; i++) {
+                    var resourceName = results[i].resourceName;
+                    var resourceTitle = results[i].resourceTitle;
 
-            // Creating the jsonArry to save the resourceName and resourceTitle
-            for (var i = 0; i < results.length; i++) {
-                var resourceName = results[i].resourceName;
-                var resourceTitle = results[i].resourceTitle;
+                    var tempObject = new Object();
+                    tempObject.resourceName = resourceName;
+                    tempObject.resourceTitle = resourceTitle;
 
-                var tempObject = new Object();
-                tempObject.resourceName = resourceName;
-                tempObject.resourceTitle = resourceTitle;
+                    jsonArray.push(tempObject);
+                }
+                jsonObject.resourceInfo = jsonArray;
 
-                jsonArray.push(tempObject);
+                console.log('MySQL : Success retrieving the resource');
+
+                fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
+                    response.status(200).end(ejs.render(data, {resourceConfig: JSON.stringify(jsonObject)}));
+                });
+            } else {
+                fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
+                    response.status(200).end(ejs.render(data));
+                });
             }
-            jsonObject.resourceInfo = jsonArray;
-
-            console.log('MySQL : Success retrieving the resource');
-
-            fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
-                response.status(200).end(ejs.render(data, {resourceConfig: JSON.stringify(jsonObject)}));
-            });
         }
     });
 });
 
-// Retrieving the request form information from MySQL.
-app.get('/', function (reqeust, response) {
+// Retrieving the request form information from MySQL
+app.get('/getSelectedResource/:resourceName', function (request, response) {
 
+    var resourceName = request.params.resourceName;
+    var client = dbClient.getDBClient(); // Getting Database information.
 
+    client.query('SELECT * FROM onem2m WHERE resourceName=?', [resourceName], function (error, results, fields) {
+        if (error) { // error
+            console.log("MySQL : Database resource retrieve error : " + error);
+            response.status(500).end();
+        } else { // success
+            // Formatting the JSON Object
+            var jsonObject = new Object();
+            var jsonArray = new Array();
+
+            jsonObject.requestInfo = new Object();
+            jsonObject.requestInfo.urlInformation = results[0].urlInformation;
+            jsonObject.requestInfo.methodInformation = results[0].methodInformation;
+            jsonObject.requestInfo.bodyInformation = results[0].resourceBody;
+
+            // Creating the JSONArray to save the request information
+            jsonArray.push(results[0].header1); jsonArray.push(results[0].header2); jsonArray.push(results[0].header3); jsonArray.push(results[0].header4);
+            jsonArray.push(results[0].header5); jsonArray.push(results[0].header6); jsonArray.push(results[0].header7); jsonArray.push(results[0].header8);
+            jsonObject.requestInfo.headerInformation = jsonArray;
+
+            response.status(200).send(jsonObject);
+            console.log('MySQL : Success retrieving the resource');
+        }
+    });
 });
 
 // Deleting the selected resource list
@@ -134,6 +164,9 @@ app.post('/saveResource', function (request, response) {
         var tempHeaderValue = headerInformation[i]['headerName'] + ":" + headerInformation[i]['headerValue'];
         headerArray[i] = tempHeaderValue;
     }
+
+    for(var i = headerInformation.length; i < 8; i++) // Setting the null to MySQL header value
+        headerArray[i] = null;
 
     var client = dbClient.getDBClient(); // Getting Database information.
 
