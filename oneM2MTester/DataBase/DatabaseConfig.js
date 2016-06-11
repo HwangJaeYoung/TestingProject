@@ -1,5 +1,6 @@
 /**
- * Created by Blossom on 2016-06-08.
+ * Created by HwangJaeYoung
+ * forest62590@gmail.com
  */
 
 var mysql = require('mysql');

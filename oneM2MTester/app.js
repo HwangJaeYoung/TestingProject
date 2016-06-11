@@ -1,12 +1,14 @@
 /**
- * Created by HwangJaeYoung on 2016-06-05.
+ * Created by HwangJaeYoung
  * forest62590@gmail.com
  */
+
 var fs = require('fs');
 var ejs = require('ejs');
 var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
+var requestFunctions = require('./RequestFuntions');
 var dbClient = require('./DataBase/DatabaseConfig');
 
 var app = express();
@@ -181,6 +183,30 @@ app.post('/saveResource', function (request, response) {
                 response.status(200).end();
             }
     });
+});
+
+app.get('/getResource/:resourceName', function (request, response) {
+    var resultObj = request.body;
+    console.log("GET : " + JSON.stringify(resultObj));
+    //requestFunctions.requestController(resultObj);
+});
+
+app.post('/createResource/:resourceName', function (request, response) {
+    var resultObj = request.body;
+    console.log("POST : " + JSON.stringify(resultObj));
+    //requestFunctions.requestController(resultObj);
+});
+
+app.delete('/delResource/:resourceName', function (request, response) {
+    var resultObj = request.body;
+    console.log("DELETE : " + JSON.stringify(resultObj));
+    //requestFunctions.requestController(resultObj);
+});
+
+app.put('/updateResource/:resourceName', function (request, response) {
+    var resultObj = request.body;
+    console.log("PUT : " + JSON.stringify(resultObj));
+    //requestFunctions.requestController(resultObj);
 });
 
 // Server start
