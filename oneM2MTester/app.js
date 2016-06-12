@@ -185,28 +185,14 @@ app.post('/saveResource', function (request, response) {
     });
 });
 
-app.get('/getResource/:resourceName', function (request, response) {
+app.post('/requestManage', function (request, response) {
     var resultObj = request.body;
-    console.log("GET : " + JSON.stringify(resultObj));
-    //requestFunctions.requestController(resultObj);
-});
+    var requestInfoObject = resultObj['requestInfo'];
 
-app.post('/createResource/:resourceName', function (request, response) {
-    var resultObj = request.body;
-    console.log("POST : " + JSON.stringify(resultObj));
-    //requestFunctions.requestController(resultObj);
-});
-
-app.delete('/delResource/:resourceName', function (request, response) {
-    var resultObj = request.body;
-    console.log("DELETE : " + JSON.stringify(resultObj));
-    //requestFunctions.requestController(resultObj);
-});
-
-app.put('/updateResource/:resourceName', function (request, response) {
-    var resultObj = request.body;
-    console.log("PUT : " + JSON.stringify(resultObj));
-    //requestFunctions.requestController(resultObj);
+    requestFunctions.requestController(requestInfoObject, function(responseObject){
+        var status = responseObject['status'];
+        response.status(status).send(responseObject);
+    });
 });
 
 // Server start

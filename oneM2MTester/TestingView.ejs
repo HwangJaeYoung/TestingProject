@@ -182,52 +182,43 @@
                     }
                     jsonObject.requestInfo.headerInformation = jsonArray;
 
-                    // Setting the url based on method
-                    var requestURL = '';
+                    $.ajax({
+                        url: "http://127.0.0.1:62590/requestManage",
+                        type: "post",
+                        dataType: "json",
+                        cache: false,
+                        timeout: 30000,
+                        data: JSON.stringify(jsonObject),
+                        contentType: "application/json",
+                        success: function (responseData) {
+                            var headers = responseData['headers'];
+                            var headerInfo = '';
 
-                    if(methodInformation == "GET")
-                        requestURL = "getResource" + "/" + idValue;
-                    else if(methodInformation == "POST")
-                        requestURL = "createResource" + "/" + idValue;
-                    else if(methodInformation == "PUT")
-                        requestURL = "updateResource" + "/" + idValue;
-                    else if(methodInformation == "DELETE")
-                        requestURL = "delResource" + "/" + idValue;
+                            for(headerName in headers) {
+                                var headerValue = headers[headerName];
+                                headerInfo += (headerName + " : " + headerValue + '\n');
+                            }
 
-                    // GET and DELETE are not use a body information.
-                    if(methodInformation == "GET" || methodInformation == "DELETE") {
-                        $.ajax({
-                            url: "http://127.0.0.1:62590/" + requestURL,
-                            type: methodInformation,
-                            dataType: "json",
-                            cache: false,
-                            timeout: 30000,
-                            data: JSON.stringify(jsonObject),
-                            contentType: "application/json",
-                            success: function (data) {
-                                alert("test sending function");
-                            },
-                            error: function (xhr, textStatus, errorThrown) {
-                                alert(textStatus + ' : ' + errorThrown);
+                            $('#statusResult').html("Status : " + responseData['status']);
+                            $('#headerTextResult').val(headerInfo);
+                            $('#bodyTextResult').val(responseData['body']);
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            var errorInfoObject = JSON.parse(xhr.responseText);
+
+                            var headers = errorInfoObject['headers'];
+                            var headerInfo = '';
+
+                            for(headerName in headers) {
+                                var headerValue = headers[headerName];
+                                headerInfo += (headerName + " : " + headerValue + '\n');
                             }
-                        });
-                    } else if(methodInformation == "POST" || methodInformation == "PUT") {
-                        $.ajax({
-                            url: "http://127.0.0.1:62590/" + requestURL,
-                            type: methodInformation,
-                            dataType: "json",
-                            cache: false,
-                            timeout: 30000,
-                            data: JSON.stringify(jsonObject),
-                            contentType: "application/json",
-                            success: function (data) {
-                                alert("test sending function");
-                            },
-                            error: function (xhr, textStatus, errorThrown) {
-                                alert(textStatus + ' : ' + errorThrown);
-                            }
-                        });
-                    }
+
+                            $('#statusResult').html("Status : " + errorInfoObject['status']);
+                            $('#headerTextResult').val(headerInfo);
+                            $('#bodyTextResult').val(errorInfoObject['body']);
+                        }
+                    });
                 } else {
                     alert("You are not selecting the specific resource list!!");
                 }
@@ -396,6 +387,11 @@
                 $('.resourceListEvent').css("background", "#DAE9BC");
                 $(this).css('background', "#a7dbd8")
 
+                // Initializing the format
+                $("#statusResult").html(''); // status response result
+                $("#headerTextResult").val(''); // header response result
+                $("#bodyTextResult").val(''); // body response result
+
                 /* Using a global variable */
                 idValue = $(this).attr('id'); // This is a global variable for deleting the resource.
 
@@ -542,10 +538,14 @@
         </div>
 
         </span>
-
         <span id="responseFormat">
+            <div id = "statusResult"> </div>
+            <div id="headerInfoResult">
+                <textarea readonly id="headerTextResult" rows="10" cols="87" style="resize:none"></textarea>
+            </div>
+
             <div id="bodyInfoResult">
-                <textarea id="bodyTextResult" rows="30" cols="87" style="resize:none"></textarea>
+                <textarea readonly id="bodyTextResult" rows="30" cols="87" style="resize:none"></textarea>
             </div>
         </span>
 </main>
