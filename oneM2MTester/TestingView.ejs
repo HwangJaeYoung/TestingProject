@@ -8,9 +8,11 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
     <title> oneM2M Web Testing </title>
     <style type="text/css">
-
         body {
             margin: 0;
             padding: 0;
@@ -20,7 +22,6 @@
             font-family: Sans-serif;
             line-height: 1.5em;
         }
-
         #header {
             position: absolute;
             top: 0;
@@ -30,7 +31,6 @@
             overflow: hidden; /* Disables scrollbars on the header frame. To enable scrollbars, change "hidden" to "scroll" */
             background: #BCCE98;
         }
-
         #nav {
             position: absolute;
             top: 100px;
@@ -40,11 +40,9 @@
             overflow: auto; /* Scrollbars will appear on this frame only when there's enough content to require scrolling. To disable scrollbars, change to "hidden", or use "scroll" to enable permanent scrollbars */
             background: #DAE9BC;
         }
-
         #logo {
             padding: 10px;
         }
-
         main {
             position: fixed;
             top: 100px; /* Set this to the height of the header */
@@ -54,7 +52,6 @@
             overflow: auto;
             background: #fff;
         }
-
         #testingFormat {
             position: absolute;
             top: 10px; /* Set this to the height of the header */
@@ -62,7 +59,6 @@
             height: 600px;
             width: 400px;
         }
-
         #responseFormat {
             position: absolute;
             top: 30px; /* Set this to the height of the header */
@@ -70,7 +66,6 @@
             height: 600px;
             width: 400px;
         }
-
         #urlInfo {
             position: relative;
             top: 20px;
@@ -79,7 +74,6 @@
             height: 50px;
             width: 635px;
         }
-
         #headerInfo {
             position: relative;
             top: 40px;
@@ -89,7 +83,6 @@
             height: 200px;
             overflow: auto;
         }
-
         #bodyInfo {
             position: relative;
             top: 40px;
@@ -98,7 +91,6 @@
             height: 380px;
             width: 205px;
         }
-
         #saveButtonInfo {
             position: relative;
             top: 120px;
@@ -107,46 +99,40 @@
             height: 30px;
             width: 60px;
         }
-
         .innertube {
             margin: 15px; /* Provides padding for the content */
         }
-
         p {
             color: #555;
         }
-
         nav ul {
             list-style-type: none;
             margin: 0;
             padding: 0;
         }
-
         nav ul a {
             color: darkgreen;
             text-decoration: none;
         }
-
         /*IE6 fix*/
         * html body {
             padding: 100px 0 0 230px; /* Set the first value to the height of the header and last value to the width of the nav */
         }
-
         * html main {
             height: 100%;
             width: 100%;
         }
     </style>
 
-    <!-- jQuery Framework 참조하기 -->
-    <script src="https://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
+    <script src="jquery-3.0.0.min.js"></script>
+    <!--[if lt IE 9]>
+    <script src="html5shiv.js"></script>
+    <![endif]-->
 
     <script type="text/javascript">
-
         /************** Defining the global variable **************/
         window.idValue = 0;
         window.headerCount = 0;
-
         $(function () {
             // Request to specific server
             $('#request').click(function() {
@@ -157,31 +143,24 @@
                     var bodyInformation = $("#bodyText").val(); // Getting the body information
                     var headerNameList = $('.headerName'); // Getting the header name list
                     var headerValueList = $('.headerValue'); // Getting the header value list
-
                     // Formatting the JSON Object
                     var jsonObject = new Object();
                     var jsonArray = new Array();
-
                     jsonObject.requestInfo = new Object();
-
                     jsonObject.requestInfo.resourceName = idValue;
                     jsonObject.requestInfo.urlInformation = urlInformation;
                     jsonObject.requestInfo.methodInformation = methodInformation;
                     jsonObject.requestInfo.bodyInformation = bodyInformation;
-
                     // Creating the JSONArray to save the request information
                     for (var i = 0; i < headerNameList.length; i++) {
                         var headerName = headerNameList[i].value;
                         var headerValue = headerValueList[i].value;
-
                         var tempObject = new Object();
                         tempObject.headerName = headerName;
                         tempObject.headerValue = headerValue;
-
                         jsonArray.push(tempObject);
                     }
                     jsonObject.requestInfo.headerInformation = jsonArray;
-
                     $.ajax({
                         url: "http://127.0.0.1:62590/requestManage",
                         type: "post",
@@ -193,27 +172,22 @@
                         success: function (responseData) {
                             var headers = responseData['headers'];
                             var headerInfo = '';
-
                             for(headerName in headers) {
                                 var headerValue = headers[headerName];
                                 headerInfo += (headerName + " : " + headerValue + '\n');
                             }
-
                             $('#statusResult').html("Status : " + responseData['status']);
                             $('#headerTextResult').val(headerInfo);
                             $('#bodyTextResult').val(responseData['body']);
                         },
                         error: function (xhr, textStatus, errorThrown) {
                             var errorInfoObject = JSON.parse(xhr.responseText);
-
                             var headers = errorInfoObject['headers'];
                             var headerInfo = '';
-
                             for(headerName in headers) {
                                 var headerValue = headers[headerName];
                                 headerInfo += (headerName + " : " + headerValue + '\n');
                             }
-
                             $('#statusResult').html("Status : " + errorInfoObject['status']);
                             $('#headerTextResult').val(headerInfo);
                             $('#bodyTextResult').val(errorInfoObject['body']);
@@ -223,42 +197,32 @@
                     alert("You are not selecting the specific resource list!!");
                 }
             });
-
             // Saving the all request information
             $('#saveButton').click(function () {
-
                 if (idValue != 0) {
-
                     var urlInformation = $('#setURL').val(); // Getting the url information
                     var methodInformation = $('#methodList :selected').text(); // Getting the method information
                     var bodyInformation = $("#bodyText").val(); // Getting the body information
                     var headerNameList = $('.headerName'); // Getting the header name list
                     var headerValueList = $('.headerValue'); // Getting the header value list
-
                     // Formatting the JSON Object
                     var jsonObject = new Object();
                     var jsonArray = new Array();
-
                     jsonObject.requestInfo = new Object();
-
                     jsonObject.requestInfo.resourceName = idValue;
                     jsonObject.requestInfo.urlInformation = urlInformation;
                     jsonObject.requestInfo.methodInformation = methodInformation;
                     jsonObject.requestInfo.bodyInformation = bodyInformation;
-
                     // Creating the JSONArray to save the request information
                     for (var i = 0; i < headerNameList.length; i++) {
                         var headerName = headerNameList[i].value;
                         var headerValue = headerValueList[i].value;
-
                         var tempObject = new Object();
                         tempObject.headerName = headerName;
                         tempObject.headerValue = headerValue;
-
                         jsonArray.push(tempObject);
                     }
                     jsonObject.requestInfo.headerInformation = jsonArray;
-
                     $.ajax({
                         url: "http://127.0.0.1:62590/saveResource",
                         type: "post",
@@ -278,35 +242,27 @@
                     alert("You are not selecting the specific resource list!!");
                 }
             });
-
             // Adding a header (Maximum 8)
             $('#addHeader').click(function () {
-
                 if (headerCount < 8) {
-
                     var headerElement = $("<div>").append("<span>");
-
                     var headerNameInput = $('<input>');
                     headerNameInput.attr({
                         "type": "text",
                         "class": "headerName"
                     });
-
                     var headerValueInput = $('<input>');
                     headerValueInput.attr({
                         "type": "text",
                         "class": "headerValue"
                     });
-
                     var headerDelButton = $('<input>');
                     headerDelButton.attr({
                         "type": "button",
                         "value": "Delete",
                         "class": "deleteHeaderFormat"
                     });
-
                     headerElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
-
                     var headerListRoot = $('#headerElement');
                     headerListRoot.append(headerElement);
                     headerCount++;
@@ -314,16 +270,12 @@
                     alert("You do not create the header more than 9");
                 }
             });
-
             // Creating a resource with RandomValue;
             $('#createResource').click(function () {
-
                 var resourceTitle = prompt(' Enter the resource name', 'ex) AE_Resource_Create');
-
                 if (resourceTitle) {
                     var resourceName = Math.floor(Math.random() * 10000000); // randomValue for create resource name
                     var params = "resourceName=" + resourceName + "&" + "resourceTitle=" + resourceTitle;
-
                     $.ajax({
                         url: "http://127.0.0.1:62590/createResource",
                         type: "post",
@@ -334,13 +286,11 @@
                         success: function (data) {
                             // Creating a resource list with resourceName
                             var resourceListRoot = $('#resourceListRoot');
-
                             // Constructing the resource list
                             var resourceElement = $("<div>");
                             resourceElement.attr({'id': resourceName});
                             resourceElement.addClass("resourceListEvent");
                             resourceElement.html(resourceTitle);
-
                             resourceListRoot.append(resourceElement); // Adding the element to root */
                         },
                         error: function (xhr, textStatus, errorThrown) {
@@ -349,12 +299,9 @@
                     });
                 }
             });
-
             $('#deleteResource').click(function () {
-
                 if (idValue != 0) {
                     var check = confirm("Do you delete the selected resource?");
-
                     if (check == true && idValue != 0) {
                         $.ajax({
                             url: "http://127.0.0.1:62590/deleteResource/" + idValue,
@@ -379,22 +326,17 @@
                     alert("You are not selecting the specific resource list!!");
                 }
             });
-
             // Getting the saved data such as header and body information.
             $(document).on("click", '.resourceListEvent', function () {
-
                 // Changing the resource list color.
                 $('.resourceListEvent').css("background", "#DAE9BC");
                 $(this).css('background', "#a7dbd8")
-
                 // Initializing the format
                 $("#statusResult").html(''); // status response result
                 $("#headerTextResult").val(''); // header response result
                 $("#bodyTextResult").val(''); // body response result
-
                 /* Using a global variable */
                 idValue = $(this).attr('id'); // This is a global variable for deleting the resource.
-
                 $.ajax({
                     url: "http://127.0.0.1:62590/getSelectedResource/" + idValue,
                     type: "get",
@@ -402,53 +344,41 @@
                     cache: false,
                     timeout: 30000,
                     success: function (jsonObject) {
-
                         // Retrieving the selected variable value such as url, method, header, body
                         var resultObject = jsonObject['requestInfo'];
-
                         var urlInformation = resultObject['urlInformation'];
                         var methodInformation = resultObject['methodInformation'];
                         var bodyInformation = resultObject['bodyInformation'];
                         var headerInformation = resultObject['headerInformation'];
-
                         $('#headerElement').empty(); headerCount = 0; // Initialize the header format
-
                         for(var i = 0; i < headerInformation.length; i++) {
                             if(headerInformation[i] != null) {
-
                                 var headerSplitArray = headerInformation[i].split(":");
                                 var headerName = headerSplitArray[0];
                                 var headerValue = headerSplitArray[1];
-
                                 var headerElement = $("<div>").append("<span>");
-
                                 var headerNameInput = $('<input>');
                                 headerNameInput.attr({
                                     "type": "text",
                                     "class": "headerName"
                                 }).val(headerName);
-
                                 var headerValueInput = $('<input>');
                                 headerValueInput.attr({
                                     "type": "text",
                                     "class": "headerValue"
                                 }).val(headerValue);
-
                                 var headerDelButton = $('<input>');
                                 headerDelButton.attr({
                                     "type": "button",
                                     "value": "Delete",
                                     "class": "deleteHeaderFormat"
                                 });
-
                                 headerElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
-
                                 var headerListRoot = $('#headerElement');
                                 headerListRoot.append(headerElement);
                                 headerCount++;
                             }
                         }
-
                         // Formatting the request layout
                         if(methodInformation == null)
                             $('#methodList').val("GET");
@@ -462,27 +392,22 @@
                     }
                 });
             });
-
             // Deleteing the saved header list
             $(document).on("click", '.deleteHeaderFormat', function () {
                 headerCount--;
                 $(this).parent().remove();
             });
-
             // Assembling the element for constructing the resource
             var jsonArray = JSON.parse(JSON.stringify(<%-resourceConfig%>))['resourceInfo'];
             createFunction(jsonArray);
-
             function createFunction(jsonArray) {
                 var resourceListRoot = $('#resourceListRoot');
-
                 for (var i = 0; i < jsonArray.length; i++) {
                     // Constructing the resource list
                     var resourceElement = $("<div>");
                     resourceElement.attr({'id': jsonArray[i].resourceName});
                     resourceElement.addClass("resourceListEvent");
                     resourceElement.html(jsonArray[i].resourceTitle);
-
                     resourceListRoot.append(resourceElement);
                 }
             }
