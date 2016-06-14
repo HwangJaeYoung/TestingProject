@@ -26,33 +26,27 @@ app.get('/', function (request, response) {
             console.log("MySQL : Database resource retrieve error : " + error);
             response.status(500).end();
         } else { // success
-            if(results.length != 0) {
-                var jsonObject = new Object();
-                var jsonArray = new Array();
+            var jsonObject = new Object();
+            var jsonArray = new Array();
 
-                // Creating the jsonArry to save the resourceName and resourceTitle
-                for (var i = 0; i < results.length; i++) {
-                    var resourceName = results[i].resourceName;
-                    var resourceTitle = results[i].resourceTitle;
+            // Creating the jsonArry to save the resourceName and resourceTitle
+            for (var i = 0; i < results.length; i++) {
+                var resourceName = results[i].resourceName;
+                var resourceTitle = results[i].resourceTitle;
 
-                    var tempObject = new Object();
-                    tempObject.resourceName = resourceName;
-                    tempObject.resourceTitle = resourceTitle;
+                var tempObject = new Object();
+                tempObject.resourceName = resourceName;
+                tempObject.resourceTitle = resourceTitle;
 
-                    jsonArray.push(tempObject);
-                }
-                jsonObject.resourceInfo = jsonArray;
-
-                console.log('MySQL : Success retrieving the resource');
-
-                fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
-                    response.status(200).end(ejs.render(data, {resourceConfig: JSON.stringify(jsonObject)}));
-                });
-            } else {
-                fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
-                    response.status(200).end(ejs.render(data));
-                });
+                jsonArray.push(tempObject);
             }
+            jsonObject.resourceInfo = jsonArray;
+
+            console.log('MySQL : Success retrieving the resource');
+
+            fs.readFile('TestingView.ejs', 'utf-8', function (error, data) {
+                response.status(200).end(ejs.render(data, {resourceConfig: JSON.stringify(jsonObject)}));
+            });
         }
     });
 });
@@ -101,10 +95,10 @@ app.delete('/deleteResource/:resourceName', function (request, response) {
         } else { // success
             client.query('SELECT * FROM onem2m ORDER BY time ASC', function (error, results, fields) {
                 if (error) { // error
-                    console.log("MySQL : Database resource retrieve error : " + error);
+                    console.log("MySQL : Database resource delete error : " + error);
                     response.status(500).end();
                 } else { // success
-                    console.log('MySQL : Success retrieving the resource');
+                    console.log('MySQL : Success deleting the resource');
 
                     var jsonObject = new Object();
                     var jsonArray = new Array();
@@ -183,7 +177,7 @@ app.post('/saveResource', function (request, response) {
                 console.log('MySQL : Success updating the resource : ' + resourceName);
                 response.status(200).end();
             }
-    });
+        });
 });
 
 app.post('/requestManage', function (request, response) {

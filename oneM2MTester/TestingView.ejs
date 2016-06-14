@@ -360,6 +360,7 @@
                             timeout: 30000,
                             contentType: "application/json; charset=UTF-8",
                             success: function (jsonObject) {
+                                idValue = 0;
                                 $('.resourceListEvent').remove(); // Deleting the all resource of the resourceListRoot Element
                                 var jsonArray = jsonObject['resourceInfo'];
                                 createFunction(jsonArray);
@@ -483,13 +484,13 @@
 </head>
 
 <body>
-    <header id="header">
-        <div id="logo">
-            <h1> oneM2M Web Testing </h1>
-        </div>
-    </header>
+<header id="header">
+    <div id="logo">
+        <h1> oneM2M Web Testing </h1>
+    </div>
+</header>
 
-    <main>
+<main>
         <span id="testingFormat">
         <div id="urlInfo">
             <span id="methodSelection">
@@ -540,17 +541,17 @@
                 <textarea readonly id="bodyTextResult" rows="30" cols="87" style="resize:none"></textarea>
             </div>
         </span>
-    </main>
+</main>
 
-    <nav id="nav">
-        <div class="innertube">
-            <h1> Resource List </h1>
+<nav id="nav">
+    <div class="innertube">
+        <h1> Resource List </h1>
                 <span>
                     <input type="button" value="+ Resource" id="createResource"/>
                     <input type="button" value="- Resource" id="deleteResource"/>
                 </span>
-        </div>
-        <div id="resourceListRoot" class="innertube"></div>
-    </nav>
+    </div>
+    <div id="resourceListRoot" class="innertube"></div>
+</nav>
 </body>
 </html>

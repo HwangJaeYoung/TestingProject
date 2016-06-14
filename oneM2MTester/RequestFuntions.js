@@ -10,10 +10,18 @@ function requestGetDelete(requestObject, requestCallBack) {
     var headerInformation = requestObject['headerInformation'];
 
     var jsonObject  = new Object( );
+    var headerChecking = false;
 
     // Creating the dynamic body set
-    for(var i = 0; i < headerInformation.length; i++)
+    for(var i = 0; i < headerInformation.length; i++) {
         jsonObject[headerInformation[i]['headerName']] = headerInformation[i]['headerValue'];
+
+        if(headerInformation[i]['headerName'].toUpperCase() == "ACCEPT")
+            headerChecking = true;
+    }
+
+    if(headerChecking == false)
+        jsonObject["Accept"] = "*/*";
 
     requestToServer({
         url : urlInformation,
@@ -33,10 +41,18 @@ function requestPostPut(requestObject, requestCallBack) {
     var headerInformation = requestObject['headerInformation'];
 
     var jsonObject  = new Object( );
+    var headerChecking = false;
 
     // Creating the dynamic body set
-    for(var i = 0; i < headerInformation.length; i++)
+    for(var i = 0; i < headerInformation.length; i++) {
         jsonObject[headerInformation[i]['headerName']] = headerInformation[i]['headerValue'];
+
+        if(headerInformation[i]['headerName'].toUpperCase() == "ACCEPT")
+            headerChecking = true;
+    }
+
+    if(headerChecking == false)
+        jsonObject["Accept"] = "*/*";
 
     requestToServer({
         url : urlInformation,

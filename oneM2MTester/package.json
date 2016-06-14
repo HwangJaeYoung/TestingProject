@@ -10,7 +10,6 @@
     "mysql": "^2.11.1",
     "request": "^2.72.0"
   },
-  "devDependencies": "oneM2M Web Tester",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
