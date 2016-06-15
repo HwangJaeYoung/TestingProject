@@ -15,6 +15,7 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('Javascript'));
+app.use(express.static('CSS'));
 
 // Connecting the oneM2M Web Tester page.
 app.get('/', function (request, response) {
@@ -29,7 +30,7 @@ app.get('/', function (request, response) {
             var jsonObject = new Object();
             var jsonArray = new Array();
 
-            // Creating the jsonArry to save the resourceName and resourceTitle
+            // Creating the jsonArray to save the resourceName and resourceTitle
             for (var i = 0; i < results.length; i++) {
                 var resourceName = results[i].resourceName;
                 var resourceTitle = results[i].resourceTitle;
@@ -103,7 +104,7 @@ app.delete('/deleteResource/:resourceName', function (request, response) {
                     var jsonObject = new Object();
                     var jsonArray = new Array();
 
-                    // Creating the jsonArry to save the resourceName and resourceTitle
+                    // Creating the jsonArray to save the resourceName and resourceTitle
                     for (var i = 0; i < results.length; i++) {
                         var resourceName = results[i].resourceName;
                         var resourceTitle = results[i].resourceTitle;
