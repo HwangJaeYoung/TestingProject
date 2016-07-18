@@ -191,6 +191,16 @@ app.post('/requestManage', function (request, response) {
     });
 });
 
+// Updating the resource list index
+app.put('/updatingResourceList', function (request, response) {
+    // todo
+    // update query
+
+
+
+
+});
+
 // Server start
 http.createServer(app).listen(62590, function () {
     console.log('Server running port at ' + 'http://127.0.0.1:62590');
