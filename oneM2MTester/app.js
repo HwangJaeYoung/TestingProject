@@ -193,12 +193,37 @@ app.post('/requestManage', function (request, response) {
 
 // Updating the resource list index
 app.put('/updatingResourceList', function (request, response) {
-    // todo
-    // update query
 
+    var resultObj = request.body;
+    var updatedIDList = resultObj['idList'];
 
+    // Updating the user request format
+    var idCounting = 0;
 
+    var checkFunction = function( ) {
+        console.log("call");
+        if(idCounting == updatedIDList.length) {
+            response.status(200).end();
+        }
+    }
 
+    for(var i = 0; i < updatedIDList.length; i++) {
+
+        var latest = timestamp();
+        var resourceName = updatedIDList[i];
+        var client = dbClient.getDBClient(); // Getting Database information.
+
+        client.query('UPDATE onem2m SET time=? WHERE resourceName=?', [latest, resourceName], function (error, results, fields) {
+            if (error) { // error
+                console.log("MySQL : Database resource update error : " + error);
+                response.status(500).end();
+            } else { // success
+                console.log('MySQL : Success updating the resource : ' + resourceName);
+                idCounting++;
+                checkFunction();
+            }
+        });
+    }
 });
 
 // Server start

@@ -411,28 +411,30 @@
             $("#resourceListRoot").sortable({
                 axis: "y",
                 stop: function(event, ui) {
-                    $('#resourceListRoot').find('li').each(function() {
+                    var jsonObject = new Object();
+                    var idList = new Array();
 
-                        var idList = new Array();
-                        idList.add($(this).attr("id"));
-                        alert(idList);
+                    $('#resourceListRoot').find('li').each(function( ) {
+                        idList.push($(this).attr("id"));
+                    });
 
-                        $.ajax({
-                            url: "http://127.0.0.1:62590/updatingResourceList",
-                            type: "put",
-                            dataType: "text",
-                            cache: false,
-                            timeout: 30000,
-                            data: JSON.stringify(jsonObject),
-                            contentType: "application/json",
+                    jsonObject.idList = idList;
 
-                            success: function (data) {
-                                alert("Success updating the resource");
-                                
-                            }, error: function (xhr, textStatus, errorThrown) {
-                                alert(textStatus + ' : ' + errorThrown);
-                            }
-                        });
+                    $.ajax({
+                        url: "http://127.0.0.1:62590/updatingResourceList",
+                        type: "put",
+                        dataType: "text",
+                        cache: false,
+                        timeout: 30000,
+                        data: JSON.stringify(jsonObject),
+                        contentType: "application/json",
+
+                        success: function (data) {
+                            alert("Success updating the resource");
+
+                        }, error: function (xhr, textStatus, errorThrown) {
+                            alert(textStatus + ' : ' + errorThrown);
+                        }
                     });
                 }
             });
