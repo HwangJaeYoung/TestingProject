@@ -191,6 +191,49 @@ app.post('/requestManage', function (request, response) {
     });
 });
 
+// Updating the resource list index
+app.put('/updatingResourceList', function (request, response) {
+
+    var resultObj = request.body;
+    var updatedIDList = resultObj['idList'];
+    var idListOrder = new Array();
+
+    // Updating the user request format
+    var idCounting = 0, listCounting = 0;
+
+    var dbIterationFunction = function () {
+        var client = dbClient.getDBPool();
+        var resourceName = updatedIDList[listCounting++];
+
+        client.getConnection(function (err, connection) {
+            if (err) {
+                connection.release();
+                console.log(err);
+            } else {
+                connection.query('UPDATE onem2m SET time=? WHERE resourceName=?', [timestamp(), resourceName], function (error, results, fields) {
+                    if (error) { // error
+                        console.log("MySQL : Database resource update error : " + error);
+                        response.status(500).end();
+                        connection.release();
+                    } else { // success
+                        console.log('MySQL : Success updating the resource : ' + resourceName);
+                        idCounting++;
+
+                        if (idCounting != updatedIDList.length) {
+                            connection.release();
+                            dbIterationFunction();
+                        } else {
+                            connection.release();
+                            response.status(200).end();
+                        }
+                    }
+                });
+            }
+        });
+    }
+    dbIterationFunction(); // Calling the iteration function for query
+});
+
 // Server start
 http.createServer(app).listen(62590, function () {
     console.log('Server running port at ' + 'http://127.0.0.1:62590');

@@ -12,7 +12,18 @@ var client = mysql.createConnection({
     database : 'blossom'
 });
 
+var pool = mysql.createPool({
+    connectionLimit : 20,
+    user            : 'root',
+    password        : 'blossom',
+    database        : 'blossom'
+});
+
 // return Database connection client
 exports.getDBClient = function( ) {
     return client;
 };
+
+exports.getDBPool = function( ) {
+    return pool;
+}

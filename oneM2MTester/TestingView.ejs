@@ -14,11 +14,13 @@
 
     <link rel="stylesheet" href="main.css">
 
-    <script src="jquery-3.0.0.min.js"></script>
-
     <!--[if lt IE 9]>
     <script src="html5shiv.js"></script>
     <![endif]-->
+
+    <!-- Setting the JQuery & JQuery-UI -->
+    <script src="jquery-3.0.0.min.js"></script>
+    <script src="jquery-ui-1.12.0/jquery-ui.js"></script>
 
     <!-- Setting the code mirror library for the textarea -->
     <link rel="stylesheet" href="codemirror/codemirror-5.15.2/lib/codemirror.css">
@@ -40,7 +42,6 @@
 
             // Request to specific server
             $('#request').click(function() {
-
                 if (idValue != 0) {
 
                     // Collecting the information to send a data to server
@@ -65,7 +66,6 @@
                         var headerName = headerNameList[i].value;
                         var headerValue = headerValueList[i].value;
                         var tempObject = new Object();
-
                         tempObject.headerName = headerName;
                         tempObject.headerValue = headerValue;
                         jsonArray.push(tempObject);
@@ -80,17 +80,25 @@
                         timeout: 30000,
                         data: JSON.stringify(jsonObject),
                         contentType: "application/json",
+
                         success: function (responseData) {
                             var headerInfo = requestResultFunction(responseData);
-
-                            $('#statusResult').html("Status : " + responseData['status']);
+                            $('#statusResult').css("color", "#eaeaea").html("Status : " + responseData['status']);
                             $('#headerTextResult').val(headerInfo);
                         }, error: function (xhr, textStatus, errorThrown) {
                             var errorInfoObject = JSON.parse(xhr.responseText);
-                            var headerInfo = requestResultFunction(errorInfoObject);
 
-                            $('#statusResult').html("Status : " + errorInfoObject['status']);
-                            $('#headerTextResult').val(headerInfo);
+                            if(errorInfoObject['status'] == "601") {
+                                alert("Could not get any response");
+                            } else {
+                                var headerInfo = requestResultFunction(errorInfoObject);
+                                var statusCode = $('#statusResult');
+
+                                statusCode.html("Status : " + errorInfoObject['status']);
+                                statusCode.css("color", "#eaeaea");
+
+                                $('#headerTextResult').val(headerInfo);
+                            }
                         }
                     });
                 } else {
@@ -119,11 +127,11 @@
                     jsonObject.requestInfo.bodyInformation = bodyInformation;
 
                     // Creating the JSONArray to save the request information
+
                     for (var i = 0; i < headerNameList.length; i++) {
                         var headerName = headerNameList[i].value;
                         var headerValue = headerValueList[i].value;
                         var tempObject = new Object();
-
                         tempObject.headerName = headerName;
                         tempObject.headerValue = headerValue;
                         jsonArray.push(tempObject);
@@ -159,26 +167,21 @@
                         "type": "text",
                         "class": "headerName"
                     });
-
                     var headerValueInput = $('<input>');
                     headerValueInput.attr({
                         "type": "text",
                         "class": "headerValue"
                     });
-
                     var headerDelButton = $('<input>');
                     headerDelButton.attr({
                         "type": "button",
                         "value": "Delete",
                         "class": "deleteHeaderFormat"
                     });
-
                     headerElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
-
                     var headerListRoot = $('#headerElement');
                     headerListRoot.append(headerElement);
                     headerCount++;
-
                 } else if (headerCount == 8) {
                     alert("You do not create the header more than 9");
                 }
@@ -186,7 +189,6 @@
 
             // Creating a resource with RandomValue;
             $('#createResource').click(function () {
-
                 var resourceTitle = prompt(' Enter the resource name', 'ex) AE_Resource_Create');
 
                 if (resourceTitle) {
@@ -200,14 +202,18 @@
                         cache: false,
                         timeout: 30000,
                         data: params,
-                        success: function (data) {
 
+                        success: function (data) {
                             // Creating a resource list with resourceName
                             var resourceListRoot = $('#resourceListRoot');
 
                             // Constructing the resource list
-                            var resourceElement = $("<div>");
+                            var resourceElement = $("<li>");
+
+                            resourceElement.css("color", "#eaeaea");
+
                             resourceElement.attr({'id': resourceName});
+                            resourceElement.addClass("ui-state-default");
                             resourceElement.addClass("resourceListEvent");
                             resourceElement.html(resourceTitle);
                             resourceListRoot.append(resourceElement); // Adding the element to root */
@@ -219,6 +225,7 @@
             });
 
             $('#deleteResource').click(function () {
+
                 if (idValue != 0) {
                     var check = confirm("Do you delete the selected resource?");
 
@@ -251,8 +258,8 @@
             $(document).on("click", '.resourceListEvent', function () {
 
                 // Changing the resource list color.
-                $('.resourceListEvent').css("background", "#DAE9BC");
-                $(this).css('background', "#a7dbd8")
+                $('.resourceListEvent').css("background", "#3f3f3f");
+                $(this).css('background', "#f47023")
 
                 // Initializing the format
                 $("#statusResult").html(''); // status response result
@@ -268,6 +275,7 @@
                     dataType: "json",
                     cache: false,
                     timeout: 30000,
+
                     success: function (jsonObject) {
 
                         $('#headerElement').empty(); headerCount = 0; // Initialize the header format
@@ -280,8 +288,8 @@
                         var headerInformation = resultObject['headerInformation'];
 
                         for(var i = 0; i < headerInformation.length; i++) {
-                            if(headerInformation[i] != null) {
 
+                            if(headerInformation[i] != null) {
                                 var headerSplitArray = headerInformation[i].split(":");
                                 var headerName = headerSplitArray[0];
                                 var headerValue = headerSplitArray[1];
@@ -305,8 +313,8 @@
                                     "value": "Delete",
                                     "class": "deleteHeaderFormat"
                                 });
-                                headerElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
 
+                                headerElement.append(headerNameInput).append(headerValueInput).append(headerDelButton);
                                 var headerListRoot = $('#headerElement');
                                 headerListRoot.append(headerElement);
                                 headerCount++;
@@ -341,11 +349,10 @@
             function createFunction(jsonArray) {
                 var resourceListRoot = $('#resourceListRoot');
                 for (var i = 0; i < jsonArray.length; i++) {
-
                     // Constructing the resource list
-                    var resourceElement = $("<div>");
-
+                    var resourceElement = $("<li>");
                     resourceElement.attr({'id': jsonArray[i].resourceName});
+                    resourceElement.css("background", "#3f3f3f");
                     resourceElement.addClass("resourceListEvent");
                     resourceElement.html(jsonArray[i].resourceTitle);
                     resourceListRoot.append(resourceElement);
@@ -377,7 +384,7 @@
             }
 
             /* 1. Editor view mode definition such as XML, JSON, Javascript
-               2. code mirror library is used in this code */
+             2. code mirror library is used in this code */
             var editorTextArea = document.getElementById('bodyText');
             var editor = CodeMirror.fromTextArea(editorTextArea, {
                 lineNumbers: true,
@@ -403,7 +410,6 @@
             $("#modeList").change(function () {
                 var modeInfo = $('#modeList :selected').text(); // Getting the mode(Javascript, XML, JSON) information
                 var changedMode = ''; // selected view mode (Javascript, XML, JSON)
-
                 if(modeInfo == "Javascript") {
                     changedMode = 'javascript';
                 } else if(modeInfo == "XML") {
@@ -413,6 +419,39 @@
                 }
                 editor.setOption("mode", changedMode);
             });
+
+            $("#resourceListRoot").sortable({
+                axis: "y",
+                stop: function(event, ui) {
+                    var jsonObject = new Object();
+                    var idList = new Array();
+
+                    $('#resourceListRoot').find('li').each(function( ) {
+                        idList.push($(this).attr("id"));
+                    });
+
+                    jsonObject.idList = idList;
+
+                    $.ajax({
+                        url: "http://127.0.0.1:62590/updatingResourceList",
+                        type: "put",
+                        dataType: "text",
+                        cache: false,
+                        timeout: 30000,
+                        data: JSON.stringify(jsonObject),
+                        contentType: "application/json",
+
+                        success: function (data) {
+                            console.log("Success updating the resource");
+
+                        }, error: function (xhr, textStatus, errorThrown) {
+                            alert(textStatus + ' : ' + errorThrown);
+                        }
+                    });
+                }
+            });
+
+            $("#resourceListRoot").disableSelection();
         });
     </script>
 </head>
@@ -460,7 +499,7 @@
 
         <div id="modeInfo">
 
-            <span> View mode : </span>
+            <span style="color: #eaeaea"> View mode : </span>
 
             <span>
                 <select id="modeList">
@@ -483,7 +522,8 @@
         <span id="responseFormat">
             <div id = "statusResult"> </div>
             <div id="headerInfoResult">
-                <textarea readonly id="headerTextResult" rows="10" cols="87" style="resize:none"></textarea>
+
+                <textarea readonly id="headerTextResult" rows="10" cols="87" style="resize:none; color: #eaeaea; background-color: #272822; border: 0px;"></textarea>
             </div>
 
             <div id="bodyInfoResult">
@@ -494,13 +534,15 @@
 
 <nav id="nav">
     <div class="innertube">
-        <h1> Resource List </h1>
-                <span>
-                    <input type="button" value="+ Resource" id="createResource"/>
-                    <input type="button" value="- Resource" id="deleteResource"/>
-                </span>
+        <h1 style="color: #eaeaea"> Resource List </h1>
+            <span>
+                <input type="button" value="+ Resource" id="createResource"/>
+                <input type="button" value="- Resource" id="deleteResource"/>
+            </span>
     </div>
-    <div id="resourceListRoot" class="innertube"></div>
+    <div>
+        <ul id="resourceListRoot" class="innertube"></ul>
+    </div>
 </nav>
 </body>
 </html>

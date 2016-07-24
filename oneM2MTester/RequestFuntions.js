@@ -26,13 +26,25 @@ function requestGetDelete(requestObject, requestCallBack) {
     requestToServer({
         url : urlInformation,
         method : requestObject['methodInformation'],
-        headers : jsonObject
+        headers : jsonObject,
+        timeout : 10000
     }, function(error, response ,body) {
-        var responseObject = Object();
-        responseObject.status = response.statusCode;
-        responseObject.headers = response.headers;
-        responseObject.body = body;
-        requestCallBack(responseObject);
+        if(error) {
+            console.log(error);
+
+            // Checking the timeout error
+            if(error.code === 'ETIMEDOUT') {
+                var responseObject = Object();
+                responseObject.status = "601";
+                requestCallBack(responseObject);
+            }
+        } else {
+            var responseObject = Object();
+            responseObject.status = response.statusCode;
+            responseObject.headers = response.headers;
+            responseObject.body = body;
+            requestCallBack(responseObject);
+        }
     });
 }
 
@@ -58,13 +70,25 @@ function requestPostPut(requestObject, requestCallBack) {
         url : urlInformation,
         method : requestObject['methodInformation'],
         headers : jsonObject,
-        body : requestObject['bodyInformation']
+        body : requestObject['bodyInformation'],
+        timeout : 10000
     }, function(error, response ,body) {
-        var responseObject = Object();
-        responseObject.status = response.statusCode;
-        responseObject.headers = response.headers;
-        responseObject.body = body;
-        requestCallBack(responseObject);
+        if(error) {
+            console.log(error);
+
+            // Checking the timeout error
+            if(error.code === 'ETIMEDOUT') {
+                var responseObject = Object();
+                responseObject.status = "601";
+                requestCallBack(responseObject);
+            }
+        } else {
+            var responseObject = Object();
+            responseObject.status = response.statusCode;
+            responseObject.headers = response.headers;
+            responseObject.body = body;
+            requestCallBack(responseObject);
+        }
     });
 }
 
