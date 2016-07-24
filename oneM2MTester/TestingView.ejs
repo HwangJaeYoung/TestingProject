@@ -83,13 +83,22 @@
 
                         success: function (responseData) {
                             var headerInfo = requestResultFunction(responseData);
-                            $('#statusResult').html("Status : " + responseData['status']);
+                            $('#statusResult').css("color", "#eaeaea").html("Status : " + responseData['status']);
                             $('#headerTextResult').val(headerInfo);
                         }, error: function (xhr, textStatus, errorThrown) {
                             var errorInfoObject = JSON.parse(xhr.responseText);
-                            var headerInfo = requestResultFunction(errorInfoObject);
-                            $('#statusResult').html("Status : " + errorInfoObject['status']);
-                            $('#headerTextResult').val(headerInfo);
+
+                            if(errorInfoObject['status'] == "601") {
+                                alert("Could not get any response");
+                            } else {
+                                var headerInfo = requestResultFunction(errorInfoObject);
+                                var statusCode = $('#statusResult');
+
+                                statusCode.html("Status : " + errorInfoObject['status']);
+                                statusCode.css("color", "#eaeaea");
+
+                                $('#headerTextResult').val(headerInfo);
+                            }
                         }
                     });
                 } else {
@@ -200,6 +209,9 @@
 
                             // Constructing the resource list
                             var resourceElement = $("<li>");
+
+                            resourceElement.css("color", "#eaeaea");
+
                             resourceElement.attr({'id': resourceName});
                             resourceElement.addClass("ui-state-default");
                             resourceElement.addClass("resourceListEvent");
@@ -340,6 +352,7 @@
                     // Constructing the resource list
                     var resourceElement = $("<li>");
                     resourceElement.attr({'id': jsonArray[i].resourceName});
+                    resourceElement.css("background", "#3f3f3f");
                     resourceElement.addClass("ui-state-default");
                     resourceElement.addClass("resourceListEvent");
                     resourceElement.html(jsonArray[i].resourceTitle);
@@ -487,7 +500,7 @@
 
         <div id="modeInfo">
 
-            <span> View mode : </span>
+            <span style="color: #eaeaea"> View mode : </span>
 
             <span>
                 <select id="modeList">
@@ -510,7 +523,8 @@
         <span id="responseFormat">
             <div id = "statusResult"> </div>
             <div id="headerInfoResult">
-                <textarea readonly id="headerTextResult" rows="10" cols="87" style="resize:none"></textarea>
+
+                <textarea readonly id="headerTextResult" rows="10" cols="87" style="resize:none; color: #eaeaea; background-color: #272822; border: 0px;"></textarea>
             </div>
 
             <div id="bodyInfoResult">
@@ -521,7 +535,7 @@
 
 <nav id="nav">
     <div class="innertube">
-        <h1> Resource List </h1>
+        <h1 style="color: #eaeaea"> Resource List </h1>
             <span>
                 <input type="button" value="+ Resource" id="createResource"/>
                 <input type="button" value="- Resource" id="deleteResource"/>

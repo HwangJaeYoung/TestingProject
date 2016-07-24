@@ -12,7 +12,8 @@
     width: 100%;
     height: 100px;
     overflow: hidden; /* Disables scrollbars on the header frame. To enable scrollbars, change "hidden" to "scroll" */
-    background: #BCCE98;
+    background: #464646;
+    color: #ffffff;
 }
 
 #nav {
@@ -22,7 +23,8 @@
     bottom: 0;
     width: 230px;
     overflow: auto; /* Scrollbars will appear on this frame only when there's enough content to require scrolling. To disable scrollbars, change to "hidden", or use "scroll" to enable permanent scrollbars */
-    background: #DAE9BC;
+    background: #3f3f3f;
+    color: #eaeaea
 }
 
 #logo {
@@ -49,7 +51,7 @@
     position: relative;
     top: 20px;
     left: 20px;
-    background: #fca;
+    background: #3f3f3f;
     height: 50px;
     width: 635px;
 }
@@ -58,7 +60,7 @@
     position: relative;
     top: 40px;
     left: 20px;
-    background: #faf;
+    background: #3f3f3f;
     width: 635px;
     height: 200px;
     overflow: auto;
@@ -116,7 +118,7 @@ main {
     right: 0;
     bottom: 0;
     overflow: auto;
-    background: #fff;
+    background: #333333;
 }
 
 nav ul {
