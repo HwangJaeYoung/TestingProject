@@ -258,8 +258,8 @@
             $(document).on("click", '.resourceListEvent', function () {
 
                 // Changing the resource list color.
-                $('.resourceListEvent').css("background", "#DAE9BC");
-                $(this).css('background', "#a7dbd8")
+                $('.resourceListEvent').css("background", "#3f3f3f");
+                $(this).css('background', "#f47023")
 
                 // Initializing the format
                 $("#statusResult").html(''); // status response result
@@ -353,7 +353,6 @@
                     var resourceElement = $("<li>");
                     resourceElement.attr({'id': jsonArray[i].resourceName});
                     resourceElement.css("background", "#3f3f3f");
-                    resourceElement.addClass("ui-state-default");
                     resourceElement.addClass("resourceListEvent");
                     resourceElement.html(jsonArray[i].resourceTitle);
                     resourceListRoot.append(resourceElement);
@@ -443,7 +442,7 @@
                         contentType: "application/json",
 
                         success: function (data) {
-                            alert("Success updating the resource");
+                            console.log("Success updating the resource");
 
                         }, error: function (xhr, textStatus, errorThrown) {
                             alert(textStatus + ' : ' + errorThrown);

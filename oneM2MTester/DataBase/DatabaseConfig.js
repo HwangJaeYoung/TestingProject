@@ -12,7 +12,7 @@ var client = mysql.createConnection({
     database : 'blossom'
 });
 
-var pool  = mysql.createPool({
+var pool = mysql.createPool({
     connectionLimit : 20,
     user            : 'root',
     password        : 'blossom',

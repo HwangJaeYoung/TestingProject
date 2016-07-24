@@ -196,6 +196,7 @@ app.put('/updatingResourceList', function (request, response) {
 
     var resultObj = request.body;
     var updatedIDList = resultObj['idList'];
+    var idListOrder = new Array();
 
     // Updating the user request format
     var idCounting = 0, listCounting = 0;
@@ -207,7 +208,7 @@ app.put('/updatingResourceList', function (request, response) {
         client.getConnection(function (err, connection) {
             if (err) {
                 connection.release();
-                throw err;
+                console.log(err);
             } else {
                 connection.query('UPDATE onem2m SET time=? WHERE resourceName=?', [timestamp(), resourceName], function (error, results, fields) {
                     if (error) { // error
@@ -218,7 +219,7 @@ app.put('/updatingResourceList', function (request, response) {
                         console.log('MySQL : Success updating the resource : ' + resourceName);
                         idCounting++;
 
-                        if(idCounting != updatedIDList.length) {
+                        if (idCounting != updatedIDList.length) {
                             connection.release();
                             dbIterationFunction();
                         } else {
@@ -230,8 +231,7 @@ app.put('/updatingResourceList', function (request, response) {
             }
         });
     }
-
-    dbIterationFunction( ); // Calling the iteration function for query
+    dbIterationFunction(); // Calling the iteration function for query
 });
 
 // Server start

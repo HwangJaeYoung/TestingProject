@@ -32,13 +32,13 @@ function requestGetDelete(requestObject, requestCallBack) {
         if(error) {
             console.log(error);
 
+            // Checking the timeout error
             if(error.code === 'ETIMEDOUT') {
                 var responseObject = Object();
                 responseObject.status = "601";
                 requestCallBack(responseObject);
             }
         } else {
-            console.log(typeof(response.statusCode));
             var responseObject = Object();
             responseObject.status = response.statusCode;
             responseObject.headers = response.headers;
@@ -76,6 +76,7 @@ function requestPostPut(requestObject, requestCallBack) {
         if(error) {
             console.log(error);
 
+            // Checking the timeout error
             if(error.code === 'ETIMEDOUT') {
                 var responseObject = Object();
                 responseObject.status = "601";
